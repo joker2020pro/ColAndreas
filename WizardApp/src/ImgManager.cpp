@@ -43,10 +43,10 @@ bool ImgFile::Load()
 			{
 				COL.emplace_back(thisEntry);
 			}
-			else if(!strcmp(fExtension, ".ipl"))
+			/*else if(!strcmp(fExtension, ".ipl"))
 			{
 				IPL.emplace_back(thisEntry);
-			}
+			}*/
 		}
 		
 		return true;
