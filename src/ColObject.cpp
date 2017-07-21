@@ -157,7 +157,7 @@ MapWaterMesh::MapWaterMesh(btDynamicsWorld* world)
 	// Create a triangular mesh
 	trimesh = new btTriangleMesh();
 
-	for (uint16_t i = 0; i < 616; i++)
+	for (uint16_t i = 0; i < 586; i++)
 	{
 		trimesh->addTriangle(btVector3(btScalar(waterData[i][0]), btScalar(waterData[i][1]), btScalar(waterData[i][2])),
 			btVector3(btScalar(waterData[i][3]), btScalar(waterData[i][4]), btScalar(waterData[i][5])),
