@@ -139,7 +139,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>Back</string>
+          <string>Назад</string>
          </property>
         </widget>
        </item>
@@ -165,7 +165,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>Next</string>
+          <string>Далее</string>
          </property>
         </widget>
        </item>
@@ -191,7 +191,7 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>Cancel</string>
+          <string>Отмена</string>
          </property>
         </widget>
        </item>
@@ -222,7 +222,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>30</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

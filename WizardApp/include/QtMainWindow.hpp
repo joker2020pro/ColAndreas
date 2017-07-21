@@ -39,6 +39,14 @@ public:
 	void acceptsLicense(bool accepts);
 	void browseGame();
 	void browseOutput();
+
+    void modpackCheckBox(bool enable);
+    void browseModPackIde();
+    void browseModPackIpl();
+    void browseModPackImg();
+
+    void linkDownloadMultiplayer();
+    void linkDownloadMultiplayerIde();
 	
 private:
 	Ui::MainWindow *ui = NULL;
@@ -53,6 +61,10 @@ private:
 	
 	QString gamePath;
 	QString outputPath;
+
+    QString mpIdePath;
+    QString mpIplPath;
+    QString mpImgPath;
 	
 	std::thread *workerThread = NULL;
 	std::mutex workerMutex;

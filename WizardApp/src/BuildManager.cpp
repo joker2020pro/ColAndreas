@@ -22,16 +22,17 @@
 */
 
 #include <sstream>
+#include <QFile>
 
-#include <QtMainWindow.hpp>
+#include <include/QtMainWindow.hpp>
 
-#include <BuildManager.h>
-#include <ImgManager.hpp>
-#include <ColManager.hpp>
+#include <include/BuildManager.h>
+#include <include/ImgManager.hpp>
+#include <include/ColManager.hpp>
 
 // BuildManager constructor
-BuildManager::BuildManager(std::string &GTADirectory, std::string &OutDirectory, bool SAMPObjects, bool CustomObjects) 
-	: GTAInstallDirectory(GTADirectory), OutfileDirectory(OutDirectory), UsingSAMPObjects(SAMPObjects), UsingCustomObjects(CustomObjects)
+BuildManager::BuildManager(std::string &GTADirectory, std::string &OutDirectory, bool SAMPObjects, bool CustomObjects, std::string &MpIdeFilePath, std::string &MpIplFilePath, std::string &MpImgFilePath)
+    : GTAInstallDirectory(GTADirectory), OutfileDirectory(OutDirectory), UsingSAMPObjects(SAMPObjects), UsingCustomObjects(CustomObjects), MpIdePath(MpIdeFilePath), MpIplPath(MpIplFilePath), MpImgPath(MpImgFilePath)
 {
 	InitDirectoryNames();
 }
@@ -42,8 +43,17 @@ void BuildManager::InitDirectoryNames()
 	
 	ImageFileNames.push_back("\\models\\gta_int.img");
 	ImageFileNames.push_back("\\models\\gta3.img");
-	if(UsingSAMPObjects) ImageFileNames.push_back("\\SAMP\\SAMPCOL.img");
-	if(UsingCustomObjects) ImageFileNames.push_back("\\SAMP\\custom.img");
+    ImageFileNames.push_back("\\models\\gamemod.img");
+
+    if(UsingSAMPObjects)
+    {
+        ImageFileNames.push_back("\\multiplayer_c\\models\\mp_col.img");
+    }
+
+    if(UsingCustomObjects)
+    {
+        ImageFileNames.push_back(MpImgPath);
+    }
 
 	//----------[ COL ]----------//
 	
@@ -52,111 +62,92 @@ void BuildManager::InitDirectoryNames()
 	//CollisionFileNames.push_back("\\models\\coll\\peds.col"; //Unusual file structure causing problems, file is unused in game.
 
 	//----------[ IPL ]----------//
-	
-	ItemPlacementFileNames.push_back("\\data\\maps\\country\\countn2.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\country\\countrye.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\country\\countryN.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\country\\countryS.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\country\\countryw.ipl");
 
-	ItemPlacementFileNames.push_back("\\data\\maps\\interior\\gen_int1.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\interior\\int_cont.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\interior\\int_veg.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\interior\\stadint.ipl");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki_add2.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki_add3.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sveg.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\add_sopki.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki_lesa.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_N.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_N2.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_Ngen.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\country_WN.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_veg.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_veg2.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_park.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_S.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\crteam\\crteam.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\crteam\\crteam_gen.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\crteam\\crteam_veg.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\ryazan\\ryazan.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\ryazan\\ryazan_gen.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\ryazan\\ryazan_veg.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\ryazan\\koryakino.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\ryazan\\koryakino_gen.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\garel.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\garel_gen.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\materik.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\materik_objs.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\materik_gen.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\SPC_generic.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\lytkarino\\lytkarino.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\lytkarino\\lyt_genveg.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\rogovichi.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\tesla_place.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\bigRyazanLes.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\OpenAir.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\batyrevo\\batyrevo.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\batyrevo\\batyrevo_tree.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\russia\\metro2.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\mod_int\\mod_int.IPL");
+    ItemPlacementFileNames.push_back("\\DATA\\MAPS\\mod_int\\AudiosurfGame.IPL");
 
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAe.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAe2.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAhills.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAn.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAn2.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAs.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAs2.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAw.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LAw2.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\LA\\LaWn.ipl");
-
-	ItemPlacementFileNames.push_back("\\data\\maps\\leveldes\\levelmap.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\leveldes\\seabed.ipl");
-
-	ItemPlacementFileNames.push_back("\\data\\maps\\SF\\SFe.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\SF\\SFn.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\SF\\SFs.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\SF\\SFSe.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\SF\\SFw.ipl");
-
-	ItemPlacementFileNames.push_back("\\data\\maps\\vegas\\vegasE.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\vegas\\vegasN.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\vegas\\vegasS.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\vegas\\vegasW.ipl");
-	ItemPlacementFileNames.push_back("\\data\\maps\\vegas\\vegaxref.ipl");
+    if(UsingCustomObjects)
+    {
+        ItemPlacementFileNames.push_back(MpIplPath);
+    }
 
 	//----------[ IDE ]----------//
 	
-	ItemDefinitionFileNames.push_back("\\data\\maps\\country\\countn2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\country\\countrye.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\country\\countryN.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\country\\countryS.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\country\\countryW.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\country\\counxref.ide");
-
-	ItemDefinitionFileNames.push_back("\\data\\maps\\generic\\barriers.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\generic\\dynamic.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\generic\\dynamic2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\generic\\multiobj.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\generic\\procobj.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\generic\\vegepart.ide");
-
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\gen_int1.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\gen_int2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\gen_int3.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\gen_int4.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\gen_int5.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\gen_intb.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\int_cont.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\int_LA.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\int_SF.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\int_veg.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\propext.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\props.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\props2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\savehous.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\interior\\stadint.ide");
-
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAe.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAe2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAhills.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAn.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAn2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAs.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAs2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAw.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAw2.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LaWn.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\LA\\LAxref.ide");
-
-	ItemDefinitionFileNames.push_back("\\data\\maps\\leveldes\\leveldes.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\leveldes\\levelmap.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\leveldes\\levelxre.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\leveldes\\seabed.ide");
-
-	ItemDefinitionFileNames.push_back("\\data\\maps\\SF\\SFe.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\SF\\SFn.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\SF\\SFs.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\SF\\SFSe.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\SF\\SFw.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\SF\\SFxref.ide");
-
-	ItemDefinitionFileNames.push_back("\\data\\maps\\vegas\\vegasE.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\vegas\\VegasN.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\vegas\\VegasS.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\vegas\\VegasW.ide");
-	ItemDefinitionFileNames.push_back("\\data\\maps\\vegas\\vegaxref.ide");
-
-	ItemDefinitionFileNames.push_back("\\data\\maps\\veh_mods\\veh_mods.ide");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\generic\\vegepart.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\generic\\barriers.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\generic\\dynamic.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\generic\\dynamic2.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\generic\\multiobj.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\generic\\procobj.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\leveldes\\levelxre.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\sopki\\newgen.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki_lesa.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_N.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_gen.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_park.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\Arzamas\\country_WN.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\Arzamas\\arzamas_S.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\crteam\\crteam.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\ryazan\\ryazan.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\russia\\garel.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\russia\\materik.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\russia\\materik_objs.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\lytkarino\\lytkarino.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\russia\\rogovichi.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\russia\\OpenAir.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\batyrevo\\batyrevo.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\mod_int\\mod_int.IDE");
+    ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\mod_int\\AudiosurfGame.IDE");
+    ItemDefinitionFileNames.push_back("\\data\\maps\\veh_mods\\veh_mods.IDE");
 	
-	if(UsingSAMPObjects) ItemDefinitionFileNames.push_back("\\SAMP\\SAMP.ide");
-	if(UsingCustomObjects) ItemDefinitionFileNames.push_back("\\SAMP\\CUSTOM.ide");
-	
+    if(UsingSAMPObjects)
+    {
+        ItemDefinitionFileNames.push_back("\\multiplayer_c\\models\\mp.ide");
+    }
+
+    if(UsingCustomObjects)
+    {
+        ItemDefinitionFileNames.push_back(MpIdePath);
+    }
+
 	#ifndef WIN32
 	for(std::string &s : ImageFileNames)
 		std::replace(s.begin(), s.end(), '\\', '/');
@@ -198,15 +189,22 @@ bool BuildManager::ExtractImageFiles()
 {
 	for(std::string &name : ImageFileNames)
 	{
-		mainWindow->addFormattedMessage("\tOpening archive: %s", name.c_str());
+        mainWindow->addFormattedMessage("\tОткрытие архива: %s", name.c_str());
+
+        std::string path(GTAInstallDirectory + name);
+
+        if(!QFile::exists(QString::fromStdString(path)))
+        {
+            path.assign(name);
+        }
+
+        ImgFile thisFile(path);
 		
-		ImgFile thisFile(GTAInstallDirectory + name);
-		
-		if(thisFile.Load())
+        if(thisFile.Load())
 		{
 			for(ImgEntry &e : thisFile.COL)
 			{
-				mainWindow->addFormattedMessage("\t\tLoading: %s", e.name);
+                mainWindow->addFormattedMessage("\t\tЗагрузка: %s", e.name);
 				
 				thisFile.handle->seekg(e.offset * 2048);
 				
@@ -222,7 +220,7 @@ bool BuildManager::ExtractImageFiles()
 			
 			for(ImgEntry &e : thisFile.IPL)
 			{
-				mainWindow->addFormattedMessage("\t\tLoading: %s", e.name);
+                mainWindow->addFormattedMessage("\t\tЗагрузка: %s", e.name);
 				
 				char *data = new char[e.streamingSize * 2048];
 				
@@ -234,12 +232,12 @@ bool BuildManager::ExtractImageFiles()
 				delete [] data;
 			}
 			
-			mainWindow->addMessage("\t\tDone!\n");
+            mainWindow->addMessage("\t\tГотово!\n");
 		}
-		else
-		{
-			mainWindow->addMessage("\t\tERROR: Failed to open file!\n");
-		}
+        else
+        {
+            mainWindow->addMessage("\t\tОшибка: не удалось открыть файл!\n");
+        }
 	}
 	
 	return true;
@@ -251,15 +249,15 @@ bool BuildManager::ExtractCollisionFiles()
 	bool ReturnValue = true;
 	for(std::string &col : CollisionFileNames)
 	{
-		mainWindow->addFormattedMessage("\tLoading: %s", col.c_str());
+        mainWindow->addFormattedMessage("\tЗагрузка: %s", col.c_str());
 		
 		if (ReadColFile((GTAInstallDirectory + col).c_str()))
 		{
-			mainWindow->addMessage("\t\tDone!");
+            mainWindow->addMessage("\t\tГотово!");
 		}
 		else
 		{
-			mainWindow->addMessage("\t\tERROR: Failed to open file!");
+            mainWindow->addMessage("\t\tОшибка: не удалось открыть файл!");
 			ReturnValue = false;
 		}
 	}
@@ -421,13 +419,20 @@ bool BuildManager::ExtractItemPlacementFiles()
 	
 	for(std::string &ipl : ItemPlacementFileNames)
 	{
-		if (ReadItemPlacementData((GTAInstallDirectory + ipl).c_str()))
+        std::string path(GTAInstallDirectory + ipl);
+
+        if(!QFile::exists(QString::fromStdString(path)))
+        {
+            path.assign(ipl);
+        }
+
+        if (ReadItemPlacementData(path.c_str()))
 		{
-			mainWindow->addFormattedMessage("\tLoaded: %s", ipl.c_str());
+            mainWindow->addFormattedMessage("\tЗагружено: %s", ipl.c_str());
 		}
 		else
 		{
-			mainWindow->addFormattedMessage("\tFailed to load: %s", ipl.c_str());
+            mainWindow->addFormattedMessage("\tНе удалось загрузить: %s", ipl.c_str());
 			ReturnValue = false;
 		}
 	}
@@ -441,13 +446,20 @@ bool BuildManager::ExtractItemDefinitionFiles()
 	
 	for(std::string &ide : ItemDefinitionFileNames)
 	{
-		if (ReadItemDefinitionFile((GTAInstallDirectory + ide).c_str()))
+        std::string path(GTAInstallDirectory + ide);
+
+        if(!QFile::exists(QString::fromStdString(path)))
+        {
+            path.assign(ide);
+        }
+
+        if (ReadItemDefinitionFile(path.c_str()))
 		{
-			mainWindow->addFormattedMessage("\tLoaded: %s", ide.c_str());
+            mainWindow->addFormattedMessage("\tЗагружено: %s", ide.c_str());
 		}
 		else
 		{
-			mainWindow->addFormattedMessage("\tFailed to load: %s", ide.c_str());
+            mainWindow->addFormattedMessage("\tНе удалось загрузить: %s", ide.c_str());
 			ReturnValue = false;
 		}
 	}
@@ -531,7 +543,7 @@ bool BuildManager::ReadItemDefinitionFile(const char fname[])
 					}
 				}
 				
-				if(!thisObject.ModelName.length()) mainWindow->addFormattedMessage("\tERROR: Object %d has empty name.", thisObject.modelid);
+                if(!thisObject.ModelName.length()) mainWindow->addFormattedMessage("\tОшибка: объект %d имеет пустое название.", thisObject.modelid);
 				modelnameLookup.insert(thisObject.ModelName, thisObject.modelid);
 				modelidLookup.emplace(std::pair<int, std::string>(thisObject.modelid, thisObject.ModelName));
 				
@@ -563,7 +575,7 @@ void BuildManager::PrepareDatabaseStructures()
 			}
 			else
 			{
-				mainWindow->addFormattedMessage("\tWARN: Collision %s is unused, ignoring.", it->name.c_str());
+                mainWindow->addFormattedMessage("\tПредупреждение: коллизия %s не используется, игнорируется.", it->name.c_str());
 				it = COLArray.erase(it);
 				continue;
 			}
@@ -601,18 +613,18 @@ bool BuildManager::WriteBinaryFile(const char fname[])
 		ColAndreasBinaryfile.write((char*) &FileExtension, 4);
 		
 		//Version
-		uint16_t dbVersion = CA_DATABASE_VERSION;
+        uint16_t dbVersion = 2;
 		ColAndreasBinaryfile.write((char*) &dbVersion, 2);
 
 		//Number of collision files
 		uint16_t colCount = COLArray.size();
 		ColAndreasBinaryfile.write((char*) &colCount, sizeof(colCount));
-		mainWindow->addFormattedMessage("\tModels: %u", colCount);
+        mainWindow->addFormattedMessage("\tКол-во моделей: %u", colCount);
 		
 		//Number of item placment entries
 		uint32_t iplCount = IPLArray.size();
 		ColAndreasBinaryfile.write((char*) &iplCount, sizeof(iplCount));
-		mainWindow->addFormattedMessage("\tItem entries: %u", iplCount);
+        mainWindow->addFormattedMessage("\tКол-во IPL-размещений: %u", iplCount);
 
 		for(ColModel &m : COLArray)
 		{
@@ -677,7 +689,7 @@ bool BuildManager::WriteBinaryFile(const char fname[])
 			ColAndreasBinaryfile.write((char*) &(o.Rotation), sizeof(IPLRot));
 		}
 		
-		mainWindow->addFormattedMessage("\tFile size: %.2f MiB", float(ColAndreasBinaryfile.tellp()) / (1024.0f * 1024.0f));
+        mainWindow->addFormattedMessage("\tРазмер файла: %.2f МБ", float(ColAndreasBinaryfile.tellp()) / (1024.0f * 1024.0f));
 		
 		return true;
 	}

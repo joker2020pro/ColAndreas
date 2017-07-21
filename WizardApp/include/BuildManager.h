@@ -39,7 +39,7 @@
 #include <assert.h>
 #include <array>
 
-#include <ATree.hpp>
+#include <include/ATree.hpp>
 
 #define GetBytes(Source, Destination, Index, BytesToCopy) memcpy(&Destination, (Source + Index), BytesToCopy), Index+=BytesToCopy
 
@@ -116,6 +116,9 @@ private:
 	uint8_t ERROR_CODE;//uint8_t
 	std::string GTAInstallDirectory;
 	std::string OutfileDirectory;
+    std::string MpIdePath;
+    std::string MpIplPath;
+    std::string MpImgPath;
 
 	std::vector<BuildManager::IPLObject> IPLArray;
 	std::vector<BuildManager::ColModel> COLArray;
@@ -139,7 +142,7 @@ private:
 	bool UsingCustomObjects;
 	
 public:
-	BuildManager(std::string &GTADirectory, std::string &OutDirectory, bool SAMPObjects, bool CustomObjects);
+    BuildManager(std::string &GTADirectory, std::string &OutDirectory, bool SAMPObjects, bool CustomObjects, std::string &MpIdeFilePath, std::string &MpIplFilePath, std::string &MpImgFilePath);
 
 	bool ExtractImageFiles();
 	bool ExtractCollisionFiles();

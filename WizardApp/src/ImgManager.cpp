@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include <ImgManager.hpp>
+#include <include/ImgManager.hpp>
 
 ImgFile::ImgFile(std::string path)
 {

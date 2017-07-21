@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include <ColManager.hpp>
+#include <include/ColManager.hpp>
 
 ColFile::ColFile(std::ifstream *file) : handle(file)
 { }

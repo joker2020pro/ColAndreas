@@ -7,13 +7,13 @@
 #include <QSplashScreen>
 #include <QTimer>
 
-#ifdef WIN32
-	#include <QtPlugin>
-	Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
-#endif
+/*#ifdef WIN32
+    #include <QtPlugin>
+    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+#endif*/
 
-#include <QtMainWindow.hpp>
-#include <BuildManager.h>
+#include <include/QtMainWindow.hpp>
+#include <include/BuildManager.h>
 
 char str[512];
 
@@ -37,34 +37,34 @@ int main(int argc, char **argv)
 	return app.exec();
 }
 
-void doWork(std::string gamePath, std::string outputPath, bool SAMPObjs, bool CustomObjs)
+void doWork(std::string gamePath, std::string outputPath, bool SAMPObjs, bool CustomObjs, std::string ide, std::string ipl, std::string img)
 {
-	BuildManager *thisBuild = new BuildManager(gamePath, outputPath, SAMPObjs, CustomObjs);
+    BuildManager *thisBuild = new BuildManager(gamePath, outputPath, SAMPObjs, CustomObjs, ide, ipl, img);
 	
-	mainWindow->reportProgress(1, "Processing: Image files (.img)");
+    mainWindow->reportProgress(1, "Обработка: img-архивы (.img)");
 	thisBuild->ExtractImageFiles();
-	mainWindow->reportProgress(15, "Done.\n");
+    mainWindow->reportProgress(15, "Готово.\n");
 
-	mainWindow->reportProgress(1, "Processing: Collision files (.col)");
+    mainWindow->reportProgress(1, "Обработка: файлы коллизий (.col)");
 	thisBuild->ExtractCollisionFiles();
-	mainWindow->reportProgress(15, "Done.\n");
+    mainWindow->reportProgress(15, "Готово.\n");
 
-	mainWindow->reportProgress(1, "Processing: Item placement files (.ipl)");
+    mainWindow->reportProgress(1, "Обработка: файлы размещения объектов (.ipl)");
 	thisBuild->ExtractItemPlacementFiles();
-	mainWindow->reportProgress(15, "Done.\n");
+    mainWindow->reportProgress(15, "Готово.\n");
 
-	mainWindow->reportProgress(1, "Processing: Item definition files (.ide)");
+    mainWindow->reportProgress(1, "Обработка: файлы объявления объектов (.ide)");
 	thisBuild->ExtractItemDefinitionFiles();
-	mainWindow->reportProgress(15, "Done.\n");
+    mainWindow->reportProgress(15, "Готово.\n");
 
-	mainWindow->reportProgress(1, "Preparing database structures, this may take some time.");
-	thisBuild->PrepareDatabaseStructures();
-	mainWindow->reportProgress(15, "Done.\n");
+    mainWindow->reportProgress(1, "Сборка структуры базы данных, это может занять время...");
+    thisBuild->PrepareDatabaseStructures();
+    mainWindow->reportProgress(15, "Готово.\n");
 
-	mainWindow->reportProgress(1, "Writing the database file.");
+    mainWindow->reportProgress(1, "Запись базы данных...");
 	thisBuild->WriteBinaryFile(outputPath.c_str());
-	mainWindow->reportProgress(15, "Done.\n");
+    mainWindow->reportProgress(15, "Готово.\n");
 	
-	mainWindow->addMessage("All done!");
+    mainWindow->addMessage("Всё готово!");
 	mainWindow->setProgress(100);
 }
