@@ -41,6 +41,9 @@
 	#define INFINITY (Float:0x7F800000)
 #endif
 
+// Maximum number of raycasts in CA_RayCastMultiLine
+#define MAX_MULTICAST_SIZE 99 
+
 /**--------------------------------------------------------------------------**\
 <summary>
 	CA_Init
@@ -133,7 +136,7 @@ native CA_RayCastLineExtraID(type, Float:StartX, Float:StartY, Float:StartZ, Flo
 <param name="ModelIDs[]">The object models that the ray collided</param>
 <param name="size = sizeof(retx)">The maximum number of points to collide</param>
 <returns>
-	-1 if the ray collided with more points than than permitted by the `size` parameter
+	-1 if the ray collided with more points than than permitted by the `size` parameter or `size` is higher than MAX_MULTICAST_SIZE value
 	0 if the ray didn't collide with anything
 	The number of points collided
 </returns>
@@ -351,6 +354,19 @@ native CA_DestroyObject(index);
 
 /**--------------------------------------------------------------------------**\
 <summary>
+	CA_IsValidObject
+</summary>
+<param name="index">Checks if an object with the ID provided exists.</param>
+<returns>
+	-1 if the specified model has no collision
+	0 if the object does not exist
+	1 if the object exists
+</returns>
+\**--------------------------------------------------------------------------**/
+native CA_IsValidObject(index);
+
+/**--------------------------------------------------------------------------**\
+<summary>
 	CA_SetObjectPos
 </summary>
 <param name="index">The index of the object to be moved</param>
@@ -396,16 +412,16 @@ static stock CA_ObjectList[MAX_CA_OBJECTS][CAOBJECTINFO];
 #if defined STREAMER_TYPE_OBJECT
 
 	// Static collision object functions (The index is not returned these can not be deleted!)
-	stock CA_CreateDynamicObjectEx_SC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, worlds[] = { -1 }, interiors[] = { -1 }, players[] = { -1 }, STREAMER_TAG_AREA areas[] = { STREAMER_TAG_AREA -1 }, priority = 0, maxworlds = sizeof worlds, maxinteriors = sizeof interiors, maxplayers = sizeof players, maxareas = sizeof areas)
+	stock STREAMER_TAG_OBJECT:CA_CreateDynamicObjectEx_SC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, worlds[] = { -1 }, interiors[] = { -1 }, players[] = { -1 }, STREAMER_TAG_AREA:areas[] = { STREAMER_TAG_AREA:-1 }, priority = 0, maxworlds = sizeof worlds, maxinteriors = sizeof interiors, maxplayers = sizeof players, maxareas = sizeof areas)
 	{
-		new id = CreateDynamicObjectEx(modelid, x, y, z, rx, ry, rz, streamdistance, drawdistance, worlds, interiors, players, areas, priority, maxworlds, maxinteriors, maxplayers, maxareas);
+		new STREAMER_TAG_OBJECT:id = CreateDynamicObjectEx(modelid, x, y, z, rx, ry, rz, streamdistance, drawdistance, worlds, interiors, players, areas, priority, maxworlds, maxinteriors, maxplayers, maxareas);
 		CA_CreateObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz);
 		return id;
 	}
 
-	stock CA_CreateDynamicObject_SC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw = -1, interior = -1, playerid = -1, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, STREAMER_TAG_AREA areaid = STREAMER_TAG_AREA -1, priority = 0)
+	stock STREAMER_TAG_OBJECT:CA_CreateDynamicObject_SC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw = -1, interior = -1, playerid = -1, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, STREAMER_TAG_AREA:areaid = STREAMER_TAG_AREA:-1, priority = 0)
 	{
-		new id = CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw, interior, playerid, streamdistance, drawdistance, areaid, priority);
+		new STREAMER_TAG_OBJECT:id = CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw, interior, playerid, streamdistance, drawdistance, areaid, priority);
 		CA_CreateObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz);
 		return id;
 	}
@@ -418,7 +434,7 @@ static stock CA_ObjectList[MAX_CA_OBJECTS][CAOBJECTINFO];
 	}
 
 	// Dynamic collision object functions (Removable)
-	stock CA_CreateDynamicObjectEx_DC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, worlds[] = { -1 }, interiors[] = { -1 }, players[] = { -1 }, STREAMER_TAG_AREA areas[] = { STREAMER_TAG_AREA -1 }, priority = 0, maxworlds = sizeof worlds, maxinteriors = sizeof interiors, maxplayers = sizeof players, maxareas = sizeof areas)
+	stock CA_CreateDynamicObjectEx_DC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, worlds[] = { -1 }, interiors[] = { -1 }, players[] = { -1 }, STREAMER_TAG_AREA:areas[] = { STREAMER_TAG_AREA:-1 }, priority = 0, maxworlds = sizeof worlds, maxinteriors = sizeof interiors, maxplayers = sizeof players, maxareas = sizeof areas)
 	{
 		new index = -1;
 		#if defined _Y_ITERATE_LOCAL_VERSION
@@ -441,7 +457,7 @@ static stock CA_ObjectList[MAX_CA_OBJECTS][CAOBJECTINFO];
 			#else
 				CA_ObjectList[index][ObjectUsed] = true;
 			#endif
-			CA_ObjectList[index][ObjectID] = CreateDynamicObjectEx(modelid, x, y, z, rx, ry, rz, drawdistance, streamdistance, worlds, interiors, players, areas, priority, maxworlds, maxinteriors, maxplayers, maxareas);
+			CA_ObjectList[index][ObjectID] = _:CreateDynamicObjectEx(modelid, x, y, z, rx, ry, rz, drawdistance, streamdistance, worlds, interiors, players, areas, priority, maxworlds, maxinteriors, maxplayers, maxareas);
 			CA_ObjectList[index][ColdAndreadsID] = CA_CreateObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, true);
 			CA_ObjectList[index][ObjectType] = OBJECT_TYPE_DYNAMIC;
 		}
@@ -449,7 +465,7 @@ static stock CA_ObjectList[MAX_CA_OBJECTS][CAOBJECTINFO];
 	}
 
 
-	stock CA_CreateDynamicObject_DC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw = -1, interior = -1, playerid = -1, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, STREAMER_TAG_AREA areaid = STREAMER_TAG_AREA -1, priority = 0)
+	stock CA_CreateDynamicObject_DC(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw = -1, interior = -1, playerid = -1, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD, STREAMER_TAG_AREA:areaid = STREAMER_TAG_AREA:-1, priority = 0)
 	{
 		new index = -1;
 		#if defined _Y_ITERATE_LOCAL_VERSION
@@ -472,7 +488,7 @@ static stock CA_ObjectList[MAX_CA_OBJECTS][CAOBJECTINFO];
 			#else
 				CA_ObjectList[index][ObjectUsed] = true;
 			#endif
-			CA_ObjectList[index][ObjectID] = CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw, interior, playerid, streamdistance, drawdistance, areaid, priority);
+			CA_ObjectList[index][ObjectID] = _:CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, vw, interior, playerid, streamdistance, drawdistance, areaid, priority);
 			CA_ObjectList[index][ColdAndreadsID] = CA_CreateObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, true);
 			CA_ObjectList[index][ObjectType] = OBJECT_TYPE_DYNAMIC;
 		}
@@ -551,7 +567,7 @@ stock CA_DestroyObject_DC(index)
 			Iter_SafeRemove(CA_Objects, index, next);
 			if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_OBJECT) DestroyObject(CA_ObjectList[index][ObjectID]);
 			#if defined STREAMER_TYPE_OBJECT
-			else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) DestroyDynamicObject(CA_ObjectList[index][ObjectID]);
+			else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) DestroyDynamicObject(STREAMER_TAG_OBJECT:CA_ObjectList[index][ObjectID]);
 			#endif
 			CA_DestroyObject(CA_ObjectList[index][ColdAndreadsID]);
 			return next;
@@ -561,7 +577,7 @@ stock CA_DestroyObject_DC(index)
 	{
 		if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_OBJECT) DestroyObject(CA_ObjectList[index][ObjectID]);
 		#if defined STREAMER_TYPE_OBJECT
-		else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) DestroyDynamicObject(CA_ObjectList[index][ObjectID]);
+		else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) DestroyDynamicObject(STREAMER_TAG_OBJECT:CA_ObjectList[index][ObjectID]);
 		#endif
 		CA_ObjectList[index][ObjectUsed] = false;
 		CA_DestroyObject(CA_ObjectList[index][ColdAndreadsID]);
@@ -592,7 +608,7 @@ stock CA_SetObjectPos_DC(index, Float:x, Float:y, Float:z)
 		{
 			if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_OBJECT) SetObjectPos(CA_ObjectList[index][ObjectID], x, y, z);
 			#if defined STREAMER_TYPE_OBJECT
-				else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectPos(CA_ObjectList[index][ObjectID], x, y, z);
+				else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectPos(STREAMER_TAG_OBJECT:CA_ObjectList[index][ObjectID], x, y, z);
 			#endif
 			CA_SetObjectPos(CA_ObjectList[index][ColdAndreadsID], x, y, z);
 		}
@@ -601,7 +617,7 @@ stock CA_SetObjectPos_DC(index, Float:x, Float:y, Float:z)
 	{
 		if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_OBJECT) SetObjectPos(CA_ObjectList[index][ObjectID], x, y, z);
 		#if defined STREAMER_TYPE_OBJECT
-		else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectPos(CA_ObjectList[index][ObjectID], x, y, z);
+		else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectPos(STREAMER_TAG_OBJECT:CA_ObjectList[index][ObjectID], x, y, z);
 		#endif
 		SetObjectPos(CA_ObjectList[index][ObjectID], x, y, z);
 		CA_SetObjectPos(CA_ObjectList[index][ColdAndreadsID], x, y, z);
@@ -632,7 +648,7 @@ stock CA_SetObjectRot_DC(index, Float:rx, Float:ry, Float:rz)
 		{
 			if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_OBJECT) SetObjectRot(CA_ObjectList[index][ObjectID], rx, ry, rz);
 			#if defined STREAMER_TYPE_OBJECT
-				else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectRot(CA_ObjectList[index][ObjectID], rx, ry, rz);
+				else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectRot(STREAMER_TAG_OBJECT:CA_ObjectList[index][ObjectID], rx, ry, rz);
 			#endif
 			CA_SetObjectRot(CA_ObjectList[index][ColdAndreadsID], rx, ry, rz);
 		}
@@ -641,7 +657,7 @@ stock CA_SetObjectRot_DC(index, Float:rx, Float:ry, Float:rz)
 	{
 		if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_OBJECT) SetObjectRot(CA_ObjectList[index][ObjectID], rx, ry, rz);
 		#if defined STREAMER_TYPE_OBJECT
-			else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectRot(CA_ObjectList[index][ObjectID], rx, ry, rz);
+			else if(CA_ObjectList[index][ObjectType] == OBJECT_TYPE_DYNAMIC) SetDynamicObjectRot(STREAMER_TAG_OBJECT:CA_ObjectList[index][ObjectID], rx, ry, rz);
 		#endif
 		CA_SetObjectRot(CA_ObjectList[index][ColdAndreadsID], rx, ry, rz);
 		return 1;
@@ -757,9 +773,9 @@ stock CA_IsPlayerOnSurface(playerid, Float:tolerance=1.5)
 stock CA_RemoveBarriers()
 {
 	static const BarrierIDS[] = {
-		16439, 16438, 16437, 16436, 4527, 4526, 4525, 4524,
-		4523, 4517, 4516, 4515, 4514, 4513, 4512, 4511, 4510,
-		4509, 4508, 4507, 4506, 4505, 4504, 1662
+		4504, 4505, 4506, 4507, 4508, 4509, 4510, 4511, 4512, 4513,
+		4514, 4515, 4516, 4517, 4518, 4519, 4520, 4521, 4522, 4523,
+		4524, 4525, 4526, 4527, 16436, 16437, 16438, 16439, 1662
  	};
 
  	for(new i = 0; i < sizeof(BarrierIDS); i++)
@@ -824,7 +840,7 @@ stock CA_IsPlayerInWater(playerid, &Float:depth, &Float:playerdepth)
 	new Float:x, Float:y, Float:z, Float:retx[10], Float:rety[10], Float:retz[10], Float: retdist[10], modelids[10];
 	GetPlayerPos(playerid, x, y, z);
 	new collisions = CA_RayCastMultiLine(x, y, z+1000.0, x, y, z-1000.0, retx, rety, retz, retdist, modelids, 10);
-	if(collisions)
+	if(collisions > 0)
 	{
 		for(new i = 0; i < collisions; i++)
 		{

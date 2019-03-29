@@ -2,7 +2,7 @@
 #include "DynamicWorld.h"
 
 // Maximum number of raycasts
-#define MAX_MULTICAST_SIZE 100
+#define MAX_MULTICAST_SIZE 99
 
 //*********************************************************************************************************//
 // native functions ***************************************************************************************//
@@ -255,7 +255,7 @@ cell AMX_NATIVE_CALL ColAndreasNatives::CA_RayCastMultiLine(AMX *amx, cell *para
 	int size = params[12];
 
 	// Invalid size
-	if (size <= 0 || size >= MAX_MULTICAST_SIZE) return -1;
+	if (size <= 0 || size > MAX_MULTICAST_SIZE) return -1;
 
 	int *ModelIDs;
 	ModelIDs = new int[size];
@@ -329,6 +329,14 @@ cell AMX_NATIVE_CALL ColAndreasNatives::CA_DestroyObject(AMX *amx, cell *params)
 
 	if (index >= MAX_MAP_OBJECTS) return -1;
 	return collisionWorld->objectManager->removeObjectManager(index);
+}
+
+cell AMX_NATIVE_CALL ColAndreasNatives::CA_IsValidObject(AMX *amx, cell *params)
+{
+	uint16_t index = static_cast<uint16_t>(params[1]);
+
+	if (index >= MAX_MAP_OBJECTS) return -1;
+	return collisionWorld->objectManager->validObjectManager(index);
 }
 
 cell AMX_NATIVE_CALL ColAndreasNatives::CA_EulerToQuat(AMX *amx, cell *params)

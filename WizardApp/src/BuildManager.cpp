@@ -45,15 +45,8 @@ void BuildManager::InitDirectoryNames()
 	ImageFileNames.push_back("\\models\\gta3.img");
     ImageFileNames.push_back("\\models\\gamemod.img");
 
-    if(UsingSAMPObjects)
-    {
-        ImageFileNames.push_back("\\multiplayer_c\\models\\mp_col.img");
-    }
-
-    if(UsingCustomObjects)
-    {
-        ImageFileNames.push_back(MpImgPath);
-    }
+    if(UsingSAMPObjects) ImageFileNames.push_back("\\multiplayer_c\\models\\mp_col.img");
+    if(UsingCustomObjects) ImageFileNames.push_back(MpImgPath);
 
 	//----------[ COL ]----------//
 	
@@ -62,7 +55,7 @@ void BuildManager::InitDirectoryNames()
 	//CollisionFileNames.push_back("\\models\\coll\\peds.col"; //Unusual file structure causing problems, file is unused in game.
 
 	//----------[ IPL ]----------//
-
+	
     ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki.IPL");
     ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki_add2.IPL");
     ItemPlacementFileNames.push_back("\\DATA\\MAPS\\sopki\\sopki_add3.IPL");
@@ -103,11 +96,9 @@ void BuildManager::InitDirectoryNames()
     ItemPlacementFileNames.push_back("\\DATA\\MAPS\\mod_int\\mod_int.IPL");
     ItemPlacementFileNames.push_back("\\DATA\\MAPS\\mod_int\\AudiosurfGame.IPL");
 
-    if(UsingCustomObjects)
-    {
-        ItemPlacementFileNames.push_back(MpIplPath);
-    }
-
+    if(UsingCustomObjects) ItemPlacementFileNames.push_back(MpIplPath);
+	if(UsingSAMPObjects) ItemPlacementFileNames.push_back("\\SAMP\\SAMP.ipl");
+	
 	//----------[ IDE ]----------//
 	
     ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\generic\\vegepart.IDE");
@@ -138,16 +129,9 @@ void BuildManager::InitDirectoryNames()
     ItemDefinitionFileNames.push_back("\\DATA\\MAPS\\mod_int\\AudiosurfGame.IDE");
     ItemDefinitionFileNames.push_back("\\data\\maps\\veh_mods\\veh_mods.IDE");
 	
-    if(UsingSAMPObjects)
-    {
-        ItemDefinitionFileNames.push_back("\\multiplayer_c\\models\\mp.ide");
-    }
-
-    if(UsingCustomObjects)
-    {
-        ItemDefinitionFileNames.push_back(MpIdePath);
-    }
-
+    if(UsingSAMPObjects) ItemDefinitionFileNames.push_back("\\multiplayer_c\\models\\mp.ide");
+    if(UsingCustomObjects) ItemDefinitionFileNames.push_back(MpIdePath);
+	
 	#ifndef WIN32
 	for(std::string &s : ImageFileNames)
 		std::replace(s.begin(), s.end(), '\\', '/');
